@@ -50,3 +50,39 @@ entrance.length == 2
 0 <= entrancecol < n
 entrance will always be an empty cell.
 */
+
+class Solution {
+public:
+    vector<vector<int>> getNeighbors(vector<vector<char>>& maze, vector<int>& current) {
+        vector<vector<int>> neighbors;
+        int r = current[0], c = current[1];
+        if (r-1 >= 0 && maze[r-1][c] == '.') neighbors.push_back({r-1, c});
+        if (r+1 < maze.size() && maze[r+1][c] == '.') neighbors.push_back({r+1, c});
+        if (c-1 >= 0 && maze[r][c-1] == '.') neighbors.push_back({r, c-1});
+        if (c+1 < maze[0].size() && maze[r][c+1] == '.') neighbors.push_back({r, c+1});
+        return neighbors;
+    }
+    
+    bool isExit(vector<vector<char>>& maze, vector<int>& current) {
+        int r = current[0], c = current[1];
+        return maze[r][c] == '.' && 
+               (r == 0 || c == 0 || r == maze.size() - 1 || c == maze[0].size() - 1); 
+    }
+
+    int nearestExit(vector<vector<char>>& maze, vector<int>& entrance) {
+        queue<pair<vector<int>, int>> q{};
+        maze[entrance[0]][entrance[1]] = 'v';
+        q.push({entrance, 0});
+
+        while(!q.empty()) {
+            auto [pos, steps] = q.front(); q.pop();
+            vector<vector<int>> neighbors = getNeighbors(maze, pos);
+            for(auto nb: neighbors) {
+                if (isExit(maze, nb)) return steps+1;
+                maze[nb[0]][nb[1]] = 'v';
+                q.push({nb, steps+1});
+            }
+        }
+        return -1;
+    }
+};
